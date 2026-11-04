@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>vitawell</title>
+<meta name="description" content="vitawell 的小站：豆星，一颗从无生命开始每天演化的小星球。">
+<style>
+  :root { --bg:#0d1020; --card:#161a30; --ink:#eef0ff; --dim:#9aa0c3; --accent:#ffd27a; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:radial-gradient(1200px 600px at 50% -10%, #23305e 0%, var(--bg) 60%); color:var(--ink);
+         font:16px/1.6 -apple-system, "PingFang SC", "Noto Sans SC", system-ui, sans-serif; min-height:100vh; }
+  main { max-width:720px; margin:0 auto; padding:40px 20px 60px; }
+  header { display:flex; align-items:center; gap:12px; margin-bottom:28px; }
+  header img { width:44px; height:44px; border-radius:50%; }
+  header b { font-size:18px; } header span { color:var(--dim); font-size:14px; display:block; }
+  .planet { background:var(--card); border-radius:22px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,.35); }
+  .planet .pic { display:block; width:100%; aspect-ratio:1/1; object-fit:cover; background:#0a0c18; }
+  .planet .body { padding:22px 22px 24px; }
+  h1 { margin:0 0 4px; font-size:28px; }
+  .tag { color:var(--accent); font-size:14px; margin-bottom:12px; }
+  .desc { color:var(--dim); margin:0 0 16px; }
+  .today { background:rgba(255,255,255,.05); border-radius:14px; padding:12px 14px; margin-bottom:18px; font-size:15px; }
+  .today .ev { color:var(--dim); margin-top:6px; }
+  .btns { display:flex; gap:10px; flex-wrap:wrap; }
+  .btn { flex:1 1 140px; text-align:center; text-decoration:none; padding:13px 16px; border-radius:12px; font-weight:600; }
+  .btn.main { background:var(--accent); color:#1a1405; } .btn.alt { background:rgba(255,255,255,.08); color:var(--ink); }
+  .more { margin-top:28px; color:var(--dim); font-size:14px; }
+  .more a { color:var(--ink); }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <img src="https://avatars.githubusercontent.com/u/41141374?v=4" alt="">
+    <div><b>vitawell</b><span>做一些会自己长大的小东西</span></div>
+  </header>
+
+  <section class="planet">
+    <img class="pic" id="pic" src="https://raw.githubusercontent.com/vitawell/tiny-planet/main/data/planet.png" alt="豆星今天的样子">
+    <div class="body">
+      <h1>🫘 豆星</h1>
+      <div class="tag" id="tag">一颗从无生命开始、每天演化一次的小星球</div>
+      <p class="desc">从岩浆海开始冷却、下雨、积出海洋，再慢慢长出微生物和更多生命。每天北京时间推演一次，火山、月亮、冰冻和雨都会写进当天的日报，也能走进 3D 世界里亲眼看看。</p>
+      <div class="today" id="today">正在读取今天的豆星…</div>
+      <div class="btns">
+        <a class="btn main" href="https://vitawell.github.io/tiny-planet/play.html">走进 3D 豆星</a>
+        <a class="btn alt" href="https://vitawell.github.io/tiny-planet/">看今日日报</a>
+      </div>
+    </div>
+  </section>
+
+  <p class="more">源码：<a href="https://github.com/vitawell/tiny-planet">github.com/vitawell/tiny-planet</a> · 更多项目见 <a href="https://github.com/vitawell">GitHub</a></p>
+</main>
+<script>
+const MOON = ["新月","蛾眉月","上弦月","盈凸月","满月","亏凸月","下弦月","残月"];
+const RAIN = ["","小雨","中雨","暴雨"];
+fetch("https://raw.githubusercontent.com/vitawell/tiny-planet/main/data/today.json?t=" + Date.now())
+  .then(r => r.json()).then(d => {
+    const label = d.day_label || ("第 " + d.day + " 天");
+    const w = d.weather === "雨" && d.rain ? RAIN[d.rain] : d.weather;
+    const m = MOON[((d.moon ?? d.day) % 8 + 8) % 8];
+    document.getElementById("tag").textContent = `${label} · ${d.era} · ${d.season}季`;
+    const ev = (d.events || []).slice(0, 3).map(e => `${e.icon} ${e.who}：${e.what}`).join("<br>");
+    document.getElementById("today").innerHTML = `今天：${w} · ${m}` + (ev ? `<div class="ev">${ev}</div>` : "");
+    if (d.image) document.getElementById("pic").src = d.image;
+  }).catch(() => { document.getElementById("today").textContent = "今天的数据暂时没读到，点下面直接进去看。"; });
+</script>
+</body>
+</html>
